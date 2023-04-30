@@ -1,24 +1,6 @@
-<br>
-<form [formGroup]="productoFormulario" #Formformulario="ngForm" (ngSubmit)="anadir()">
-
-  <label for="velocidad">ID PRODUCTO: </label>
-  <input type="string" formControlName="idProducto"><br>
-  <label for="platos">CANTIDAD: </label>
-  <input type="number" formControlName="cantidad"><br>
-
-  <button type="submit" >AÑADIR</button>
+<form #reactForm="ngForm" [formGroup]="form" (ngSubmit)="addDetalle()">
+  <h2>Agregue su producto:</h2>
+  <p>ID producto: <input type="number" formControlName="id_producto" required></p>
+  <p>Cantidad: <input type="number" formControlName="cantidad" required></p>
+  <button type="submit" [disabled]="reactForm.invalid">Agregar</button>
 </form>
-<H1>CARRITO</H1>
-<table>
-  <tr>
-    <td>ID PEDIDO</td>
-    <td>ID PRODUCTO</td>
-    <td>CATIDAD</td>
-  </tr>
-  <tr *ngFor="let productos of productos">
-    <td>{{productos.idPedido}}</td>
-    <td>{{productos.idProducto}}</td>
-    <td>{{productos.cantidad}}</td>
-    <button type="submit" (click)="eliminar(productos.idProducto)" value="eliminar"></button>
-</tr>
-</table>

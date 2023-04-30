@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import { pedidos } from '../_models/pedidos';
-import { productos } from '../_models/detalles';
-import { FormControl, FormGroup } from '@angular/forms';
+import { Detalle } from '../_modelo/detalles';
+import { FormGroup, FormControl } from '@angular/forms';
 import { PedidosService } from '../pedidos.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -11,43 +10,27 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./formulario-detalles-pedido.component.css'],
 })
 export class FormularioDetallesPedidoComponent {
+  form: FormGroup;
 
-  productoFormulario:FormGroup = new FormGroup ({
-    idProducto : new FormControl(0),
-    cantidad : new FormControl(0),
-  })
-
-  pedidoID:number=0
-  productos:productos[]=[]
-
-
-
-  constructor(
-    private pedidosS:PedidosService,
-    private activarrutas: ActivatedRoute,
-    private rutes: Router
-  ) {}
-
-  ngOnInit(){
-    this.activarrutas.params.subscribe(data => {
-      this.pedidoID = data['id'];
-    })
-    this.pedidosS.getProductosAux().subscribe(data => {
-      this.productos=data
+  constructor(private router: Router, private route: ActivatedRoute, public pedidosService: PedidosService){
+    this.form = new FormGroup({
+      id_producto: new FormControl(''),
+      cantidad: new FormControl('')
     })
   }
 
-  anadir(){
-    const producto1:productos = new productos(
-      this.pedidoID,
-      this.productoFormulario.value.idProducto,
-      this.productoFormulario.value.cantidad,
-    )
-    this.pedidosS.agregarProductos(producto1)
-    console.log(producto1)
-  }
-  eliminar(n:number){
-    this.pedidosS.eliminarDeCarritos(n)
+  addDetalle(){ //agrega un detalle al carrito
+    this.pedidosService.addCarrito(
+    new Detalle(
+        this.route.snapshot.params['id'],
+        this.form.value.idProducto,
+        this.form.value.cantidad
+      ));
+    this.reset();
   }
 
+  reset(){ //limpia los campos
+    this.form.get('id_producto')?.setValue('');
+    this.form.get('cantidad')?.setValue('');
+  }
 }

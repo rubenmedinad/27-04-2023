@@ -1,46 +1,52 @@
-<h1>Lista de Pedidos</h1>
- <table>
+<form #reactForm="ngForm" [formGroup]="formPedido" (ngSubmit)="addPedido()">
+  <h1>Agregue su pedido:</h1>
+  <table>
     <tr>
-        <td>ID PEDIDO</td>
-        <td>ID CLIENTE </td>
-        <td>FORMA DE PAGO</td>
-        <td>DIRECCION DE ENTREGA</td>
+      <th>ID pedido:</th>
+      <th>ID cliente:</th>
+      <th>Forma de pago:</th>
+      <th>Dirección</th>
     </tr>
-    <tr *ngFor="let pedidos of pedidos">
-        <td>{{pedidos.idPedido}}</td>
-        <td>{{pedidos.idCliente}}</td>
-        <td>{{pedidos.formaPago}}</td>
-        <td>{{pedidos.direccionEntrega}}</td>
+    <tr>
+      <td><input type="number" formControlName="idPedido" required readonly></td>
+      <td><input type="number" formControlName="idCliente" required></td>
+      <td><input type="text" formControlName="formaPago" required></td>
+      <td><input type="text" formControlName="direccionEntrega" required></td>
     </tr>
-
-</table>
-<br><br><br>
-<table>
-  <tr>
-    <td>ID PEDIDO</td>
-    <td>ID PRODUCTO</td>
-    <td>CATIDAD</td>
-  </tr>
-  <tr *ngFor="let productos of productos">
-    <td>{{productos.idPedido}}</td>
-    <td>{{productos.idProducto}}</td>
-    <td>{{productos.cantidad}}</td>
-</tr>
-</table>
-<br><br><br>
-<form [formGroup]="pedidosFormulario" #Formformulario="ngForm" (ngSubmit)="agregar()">
-  <label for="marca">IDPEDIDO: </label>
-  <input type="number" formControlName="idPedido"><br>
-  <label for="color">ID CLIENTE </label>
-  <input type="number" formControlName="idCliente"><br>
-  <label for="velocidad">FORMA DE PAGO: </label>
-  <input type="string" formControlName="formaPago"><br>
-  <label for="platos">DIRECCION DE ENTREGA: </label>
-  <input type="string" formControlName="direccionEntrega"><br>
-  <br>
-  <button type="button" [routerLink]="['/detalle', pedidoAux.idPedido,]">Detalle</button>
-  <br>
+  </table>
+  <button type="button" [disabled]="reactForm.invalid" (click)="goToDetalles()">Agregar productos</button>
   <router-outlet></router-outlet>
   <br><br>
-  <button type="submit" >AGREGAR PEDIDO</button>
+  <button type="submit" [disabled]="reactForm.invalid || pedidosService.carrito.length==0">Enviar pedido</button>
 </form>
+
+<h3>Lista de pedidos:</h3>
+<table>
+  <tr>
+      <th>ID Pedido</th>
+      <th>ID cliente</th>
+      <th>Nombre cliente</th>
+      <th>Forma de pago</th>
+      <th>Dirección de entrega</th>
+  </tr>
+  <tr *ngFor="let pedidoList of pedidosService.mostrarPedido()">
+      <td>{{pedidoList.idPedido}}</td>
+      <td>{{pedidoList.nombreCliente}}</td>
+      <td>{{pedidoList.formaPago}}</td>
+      <td>{{pedidoList.direccionEntrega}}</td>
+  </tr>
+</table>
+
+<h3>Lista de productos:</h3>
+<table>
+  <tr>
+      <th>ID Pedido</th>
+      <th>ID Producto</th>
+      <th>Cantidad</th>
+  </tr>
+  <tr *ngFor="let listDetalle of pedidosService.mostrarDetalle()">
+      <td>{{listDetalle.idPedido}}</td>
+      <td>{{listDetalle.idProducto}}</td>
+      <td>{{listDetalle.cantidad}}</td>
+  </tr>
+</table>

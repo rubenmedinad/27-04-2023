@@ -1,44 +1,56 @@
 import { Injectable } from '@angular/core';
-import { pedidos } from './_models/pedidos';
-import { productos } from './_models/detalles';
-import {Observable, of } from 'rxjs'
+import {Detalle} from './_modelo/detalles';
+import {Pedido} from './_modelo/pedido';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PedidosService {
+  listaPedidos: Pedido[];
+  listaDetalles: Detalle[];
+  carrito: Detalle[];
 
-  constructor() { }
-
-  pedidos:pedidos[]=[]
-
-  productos:productos[]=[]
-
-  productosAUX:productos[]=[]
-  agregarProductos(nuevoProducto:productos){
-    this.productosAUX.push(nuevoProducto)
+  constructor() {
+    this.listaPedidos = [];
+    this.listaDetalles = [];
+    this.carrito = [];
   }
-  agregarPedido(nuevoPedido:pedidos){
-    this.pedidos.push(nuevoPedido)
-    for(let i = 0;i<=this.productosAUX.length-1;i++){
-      this.productos.push(this.productosAUX[i])
+
+  searchPedido(idPedido: number): Observable<Pedido>{
+    let p = this.listaPedidos.find(p => p.idPedido == idPedido);
+    return p != undefined? of(p) : of(new Pedido(0, 0, '', '','')); //Ternario
+  }
+
+  searchDetalle(idPedido: number): Observable<Detalle>{
+    let d = this.listaDetalles.find(d => d.idPedido == idPedido);
+    return d != undefined? of(d) : of(new Detalle(0, 0, 0)); //Ternario
+  }
+
+  addPedido(p: Pedido){
+    this.listaPedidos.push(p);
+  }
+
+  addCarrito(d: Detalle){
+    this.carrito.push(d);
+  }
+
+  addDetalle(){
+    for(let i=0; i<this.carrito.length; i++){
+      this.listaDetalles.push(this.carrito[i]);
     }
-    this.productosAUX.splice(0,this.productosAUX.length)
+    this.carrito = [];
   }
-  getPedidos():Observable<pedidos[]>{
-    return of(this.pedidos)
-  }
-  getProductos():Observable<productos[]>{
-    return of(this.productos)
-  }
-  getProductosAux():Observable<productos[]>{
-    return of(this.productosAUX)
-  }
-  eliminarDeCarritos(n:number){
-    let dato = this.productosAUX.findIndex((productosAUX) => productosAUX.idProducto=== n)
-    if(dato!==-1){
-    this.productosAUX.splice(dato, 1)
-    }
 
+  mostrarPedido(){
+    return this.listaPedidos;
+  }
+
+  mostrarDetalle(){
+    return this.listaDetalles;
+  }
+
+  generateId(): number{
+    return this.listaPedidos.length == 0 ? 1 : this.listaPedidos[this.listaPedidos.length-1].idPedido+1;
   }
 }

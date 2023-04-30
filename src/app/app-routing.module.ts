@@ -4,12 +4,9 @@ import { FormularioAgregarPedidoComponent } from './formulario-agregar-pedido/fo
 import { FormularioDetallesPedidoComponent } from './formulario-detalles-pedido/formulario-detalles-pedido.component';
 
 const routes: Routes = [
-  {path:"",component:FormularioAgregarPedidoComponent,children:
-    [
-      {path:"modificar/:id",component:FormularioDetallesPedidoComponent},
-      {path:"detalle/:id", component:FormularioDetallesPedidoComponent}
-    ]
-  }
+  { path: '', component: FormularioAgregarPedidoComponent, children:
+  [{ path: 'detalles/:id', component: FormularioDetallesPedidoComponent }]
+}
 ];
 
 @NgModule({

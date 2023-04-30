@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
-import { pedidos } from '../_models/pedidos';
-import { productos } from '../_models/detalles';
-import { FormControl, FormGroup } from '@angular/forms';
+import { Pedido } from '../_modelo/pedido';
+import { FormGroup, FormControl } from '@angular/forms';
 import { PedidosService } from '../pedidos.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-formulario-agregar-pedido',
@@ -11,40 +10,43 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./formulario-agregar-pedido.component.css']
 })
 export class FormularioAgregarPedidoComponent {
-  pedidos:pedidos[]=[]
-  productos:productos[]=[]
-  pedidosFormulario:FormGroup
-  pedidoAux:pedidos= new pedidos(0,"","")
-  constructor(
-    private pedidosS:PedidosService,
-    private activarrutas: ActivatedRoute,
-    private rutes: Router
-  ) {
-    this.pedidosFormulario = new FormGroup ({
-      idPedido : new FormControl({value:this.pedidoAux.idPedido, disabled:true }),
-      idCliente : new FormControl(0),
-      formaPago : new FormControl (''),
-      direccionEntrega : new FormControl('')
+  formPedido: FormGroup;
+
+  constructor(private router: Router, public pedidosService: PedidosService){
+    this.formPedido = new FormGroup({
+      idPedido: new FormControl(this.pedidosService.generateId()),
+      idCliente: new FormControl(''),
+      nombreCliente: new FormControl(''),
+      formaPago: new FormControl(''),
+      direccionEntrega: new FormControl('')
     })
   }
 
-  ngOnInit(){
-    this.pedidosS.getPedidos().subscribe(data => {
-      this.pedidos=data
-    })
-    this.pedidosS.getProductos().subscribe(data => {
-      this.productos=data
-    })
-  }
-  agregar(){
-    this.pedidoAux.idCliente = this.pedidosFormulario.value.idCliente,
-    this.pedidoAux.formaPago =  this.pedidosFormulario.value.formaPago,
-    this.pedidoAux.direccionEntrega =  this.pedidosFormulario.value.direccionEntrega,
-
-    this.pedidosS.agregarPedido(this.pedidoAux)
-    this.rutes.navigate([''])
-    this.pedidoAux = new pedidos(0,"","")
-    this.pedidosFormulario.reset()
+  goToDetalles(){
+    Object.keys(this.formPedido.controls).forEach( key => this.formPedido.get(key)?.disable())
+    this.router.navigate(['/detalles', this.formPedido.value.idPedido]);
   }
 
+  addPedido(){
+    this.pedidosService.addPedido(
+    new Pedido(
+        this.formPedido.value.idPedido,
+        this.formPedido.value.idCliente,
+        this.formPedido.value.nombreCliente,
+        this.formPedido.value.formaPago,
+        this.formPedido.value.direccionEntrega
+      ));
+    this.pedidosService.addDetalle();
+    this.resetForm();
+    Object.keys(this.formPedido.controls).forEach(key => this.formPedido.get(key)?.enable())
+    this.router.navigate(['']);
+  }
+
+  resetForm(){
+    this.formPedido.get('idPedido')?.setValue(this.pedidosService.generateId());
+    this.formPedido.get('idCliente')?.setValue('');
+    this.formPedido.get('nombreCliente')?.setValue('');
+    this.formPedido.get('formaPago')?.setValue('');
+    this.formPedido.get('direccionEntrega')?.setValue('');
+  }
 }
